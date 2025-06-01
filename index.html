@@ -12,6 +12,7 @@
         - Report Info: Event Timeline -> Goal: Inform -> Presentation: A vertical, icon-enhanced timeline built with HTML/CSS, with venue names integrated. Interaction: N/A, clarity is prioritized. Justification: A visual timeline is more engaging and easier to scan than a plain text list.
         - Report Info: Multiple Locations -> Goal: Organize -> Presentation: Content cards in a dedicated 'Locations' tab, including addresses and direct text links to Google Maps. Interaction: Click tab to view, click map link to open Google Maps. Justification: Grouping location info prevents it from cluttering the schedule; direct links provide clear navigation.
         - Report Info: Wardrobe Suggestions -> Goal: Inform & Assist -> Presentation: Structured text in a dedicated 'Wardrobe' tab with buttons to trigger Gemini API calls for AI-generated suggestions for each event. Interaction: Click button to fetch and display suggestions. Justification: Provides helpful, dynamic content where information was previously static or missing.
+        - Report Info: RSVP Form -> Goal: Collect Responses -> Presentation: Embedded Google Form in a dedicated 'RSVP' tab. Interaction: Fill out and submit the form. Justification: Provides a direct and easy way for guests to confirm their attendance.
     -->
     <style>
         body {
@@ -90,6 +91,16 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .rsvp-iframe-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            padding-top: 20px; /* Add some padding above the iframe */
+        }
+        .rsvp-iframe-container iframe {
+            max-width: 100%; /* Ensure iframe is responsive */
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -101,10 +112,11 @@
             <p class="text-lg text-gray-600 mt-2">Celebrating Their Wedding</p>
         </header>
 
-        <nav class="flex justify-center border-b-2 border-[#E0C097] mb-8">
-            <button onclick="showTab('schedule')" class="tab-button tab-active py-3 px-6 text-lg focus:outline-none transition-colors duration-300 rounded-t-md">Schedule</button>
-            <button onclick="showTab('locations')" class="tab-button py-3 px-6 text-lg focus:outline-none transition-colors duration-300 rounded-t-md">Locations</button>
-            <button onclick="showTab('wardrobe')" class="tab-button py-3 px-6 text-lg focus:outline-none transition-colors duration-300 rounded-t-md">Wardrobe</button>
+        <nav class="flex flex-wrap justify-center border-b-2 border-[#E0C097] mb-8">
+            <button onclick="showTab('schedule')" class="tab-button tab-active py-3 px-4 sm:px-6 text-base sm:text-lg focus:outline-none transition-colors duration-300 rounded-t-md">Schedule</button>
+            <button onclick="showTab('locations')" class="tab-button py-3 px-4 sm:px-6 text-base sm:text-lg focus:outline-none transition-colors duration-300 rounded-t-md">Locations</button>
+            <button onclick="showTab('wardrobe')" class="tab-button py-3 px-4 sm:px-6 text-base sm:text-lg focus:outline-none transition-colors duration-300 rounded-t-md">Wardrobe</button>
+            <button onclick="showTab('rsvp')" class="tab-button py-3 px-4 sm:px-6 text-base sm:text-lg focus:outline-none transition-colors duration-300 rounded-t-md">RSVP</button>
         </nav>
 
         <main>
@@ -279,6 +291,15 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <div id="rsvp" class="content-tab" style="display: none;">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-[#A67B5B]">RSVP</h2>
+                    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Please let us know if you'll be able to join us by filling out the form below. We can't wait to celebrate with you!</p>
+                </div>
+                <div class="rsvp-iframe-container">
+                    <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfH2Bz06wZ-mcImc-tN-z-f0ldSP-UOJ_kuV3Gc7rFBwiLwDQ/viewform?embedded=true" width="640" height="930" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
                 </div>
             </div>
         </main>
