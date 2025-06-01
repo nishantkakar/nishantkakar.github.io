@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shruthi & Nishant's Wedding</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices: 
+        - Report Info: Event Timeline -> Goal: Inform -> Presentation: A vertical, icon-enhanced timeline built with HTML/CSS, with venue names integrated. Interaction: N/A, clarity is prioritized. Justification: A visual timeline is more engaging and easier to scan than a plain text list.
+        - Report Info: Multiple Locations -> Goal: Organize -> Presentation: Content cards in a dedicated 'Locations' tab, including addresses and direct text links to Google Maps. Interaction: Click tab to view, click map link to open Google Maps. Justification: Grouping location info prevents it from cluttering the schedule; direct links provide clear navigation.
+        - Report Info: Wardrobe Suggestions -> Goal: Inform & Assist -> Presentation: Structured text in a dedicated 'Wardrobe' tab with buttons to trigger Gemini API calls for AI-generated suggestions for each event. Interaction: Click button to fetch and display suggestions. Justification: Provides helpful, dynamic content where information was previously static or missing.
+    -->
+    <style>
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #FFFBF5; /* Light warm beige */
+            color: #5C3D2E; /* Dark brown */
+        }
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+        .tab-active {
+            background-color: #E0C097; /* Muted gold */
+            color: #5C3D2E; /* Dark brown */
+            font-weight: bold;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            top: 1.25rem; /* Adjust to align with text */
+            left: -0.45rem; /* Half of width to center on line */
+            width: 1.25rem;
+            height: 1.25rem;
+            background-color: #E0C097; /* Muted gold */
+            border: 3px solid #FFFBF5; /* Background color for "cutout" effect */
+            border-radius: 50%;
+            z-index: 1;
+        }
+        .timeline-line {
+            position: absolute;
+            left: 0; /* Aligns with the bullet point center */
+            top: 1.25rem; /* Start below the first bullet's center */
+            bottom: -1.25rem; /* Extend slightly past the last item for visual balance */
+            width: 2px;
+            background-color: #E0C097; /* Muted gold */
+        }
+        .ai-suggestion-btn {
+            background-color: #A67B5B; /* Richer brown for buttons */
+            color: #FFFBF5; /* Light text on dark button */
+            transition: background-color 0.3s ease;
+        }
+        .ai-suggestion-btn:hover {
+            background-color: #8C6A4D; /* Slightly darker on hover */
+        }
+        /* Modal styles */
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #A67B5B;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto max-w-5xl p-4 sm:p-6 lg:p-8">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-[#A67B5B]">Shruthi & Nishant</h1>
+            <p class="text-lg text-gray-600 mt-2">Celebrating Their Wedding</p>
+        </header>
+
+        <nav class="flex justify-center border-b-2 border-[#E0C097] mb-8">
+            <button onclick="showTab('schedule')" class="tab-button tab-active py-3 px-6 text-lg focus:outline-none transition-colors duration-300 rounded-t-md">Schedule</button>
+            <button onclick="showTab('locations')" class="tab-button py-3 px-6 text-lg focus:outline-none transition-colors duration-300 rounded-t-md">Locations</button>
+            <button onclick="showTab('wardrobe')" class="tab-button py-3 px-6 text-lg focus:outline-none transition-colors duration-300 rounded-t-md">Wardrobe</button>
+        </nav>
+
+        <main>
+            <div id="schedule" class="content-tab">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-[#A67B5B]">Event Schedule</h2>
+                    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Here is the detailed schedule for our wedding celebrations. We can't wait to share these special moments with you!</p>
+                </div>
+                
+                <div class="space-y-12">
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-6 pl-4 border-l-4 border-[#A67B5B] text-gray-700">July 26th: Tirumala</h3>
+                        <div class="relative pl-8">
+                            <div class="timeline-line"></div>
+                            <div class="space-y-8">
+                                <div class="timeline-item relative">
+                                    <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-[#E0C097]">
+                                        <p class="font-bold text-lg text-gray-800">3:00 PM: Arrival at Shri Sringeri Shankar Mutt</p>
+                                        <p class="text-gray-600 mt-1">Shruthi’s cousin will assist with transit and rooms.</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item relative">
+                                    <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-[#E0C097]">
+                                        <p class="font-bold text-lg text-gray-800">6:00 PM: Milni 💐</p>
+                                        <p class="text-gray-600 mt-1">A warm welcome where family members exchange garlands at Shri Sringeri Shankar Mutt.</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item relative">
+                                    <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-[#E0C097]">
+                                        <p class="font-bold text-lg text-gray-800">7:00 PM - 9:00 PM: Reception 🎉</p>
+                                        <p class="text-gray-600 mt-1">Join us for an evening of celebration at Shri Sringeri Shankar Mutt.</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item relative">
+                                    <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-[#E0C097]">
+                                        <p class="font-bold text-lg text-gray-800">8:00 PM - 10:00 PM: Dinner 🍽️</p>
+                                        <p class="text-gray-600 mt-1">Enjoy a delicious feast with family and friends at Shri Sringeri Shankar Mutt.</p>
+                                    </div>
+                                </div>
+                                 <div class="timeline-item relative">
+                                    <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-[#E0C097]">
+                                        <p class="font-bold text-lg text-gray-800">10:00 PM - 11:00 PM: Nalugulu</p>
+                                        <p class="text-gray-600 mt-1">Combined Haldi ceremony at Shri Sringeri Shankar Mutt. The bride and groom will have separate ceremonies prior.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-6 pl-4 border-l-4 border-[#A67B5B] text-gray-700">July 27th: Tirumala & Departure</h3>
+                        <div class="relative pl-8">
+                            <div class="timeline-line"></div>
+                            <div class="space-y-8">
+                                <div class="timeline-item relative">
+                                    <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-[#E0C097]">
+                                        <p class="font-bold text-lg text-gray-800">2:30 AM: Get Ready</p>
+                                        <p class="text-gray-600 mt-1">Please be ready and present at the Mandapam (Shri Sringeri Shankar Mutt).</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item relative">
+                                    <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-[#E0C097]">
+                                        <p class="font-bold text-lg text-gray-800">3:00 AM - 6:00 AM: Wedding Ceremony 💍</p>
+                                        <p class="text-gray-600 mt-1">The sacred Muhurtham and wedding rituals at Shri Sringeri Shankar Mutt.</p>
+                                    </div>
+                                </div>
+                                <div class="timeline-item relative">
+                                    <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-[#E0C097]">
+                                        <p class="font-bold text-lg text-gray-800">Afternoon: Departure</p>
+                                        <p class="text-gray-600 mt-1">Travel to Delhi begins.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-6 pl-4 border-l-4 border-[#A67B5B] text-gray-700">August 2nd: Delhi</h3>
+                         <div class="relative pl-8">
+                            <div class="space-y-8">
+                                <div class="relative">
+                                    <div class="p-4 bg-white rounded-lg shadow-md border-l-4 border-[#E0C097]">
+                                        <p class="font-bold text-lg text-gray-800">August 2nd: Delhi Reception 🎉</p>
+                                        <p class="text-gray-600 mt-1"><strong>Time:</strong> 7:00 PM onwards</p>
+                                        <p class="text-gray-600 mt-1"><strong>Venue:</strong> Vardaan Sandoz, Dilli Haat Pitampura, Pitampura, Delhi, 110034.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="locations" class="content-tab" style="display: none;">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-[#A67B5B]">Venues & Locations</h2>
+                    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Key locations for our wedding events.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Tirumala Wedding Venue</h3>
+                         <p class="text-gray-600 mt-2">
+                            <strong>Venue:</strong> Shri Sringeri Shankar Mutt<br>
+                            SV Museum Rd, Tirumala, Tirupati, Andhra Pradesh 517504
+                        </p>
+                        <p class="mt-3 text-center">
+                            <a href="https://maps.app.goo.gl/aGdTW5bC12YaFcBk6" target="_blank" rel="noopener noreferrer" class="text-[#A67B5B] hover:text-[#8C6A4D] underline font-semibold">View Full Map on Google</a>
+                        </p>
+                        <p class="text-gray-600 mt-2">Assistance with accommodation and local transit will be provided upon arrival.</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Delhi Reception Venue</h3>
+                        <p class="text-gray-600 mt-2">
+                            <strong>Venue:</strong> Vardaan Sandoz<br>
+                            Dilli Haat Pitampura, Pitampura, Delhi, 110034
+                        </p>
+                         <p class="text-gray-600 mt-1"><strong>Time:</strong> 7:00 PM onwards</p>
+                        <p class="mt-3 text-center">
+                            <a href="https://maps.app.goo.gl/67yrBf5BKeTjYhs78" target="_blank" rel="noopener noreferrer" class="text-[#A67B5B] hover:text-[#8C6A4D] underline font-semibold">View Full Map on Google</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="wardrobe" class="content-tab" style="display: none;">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold text-[#A67B5B]">Wardrobe Suggestions</h2>
+                    <p class="mt-2 text-gray-600 max-w-2xl mx-auto">To help you prepare, here are some suggestions for what to wear to the different events. Click the buttons for AI-powered ideas!</p>
+                </div>
+                <div class="space-y-8">
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Reception/Dinner (Tirumala - July 26th)</h3>
+                        <div class="mt-4 grid sm:grid-cols-2 gap-x-8 gap-y-4">
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-700">Women</h4>
+                                <div id="tirumala-reception-women-suggestions" class="text-gray-600 italic mt-1">Suggestions to be added soon.</div>
+                                <button onclick="getAISuggestions('tirumala-reception-women', 'Suggest festive yet comfortable Indian attire for women attending an evening reception and dinner in Tirumala. The event is on July 26th. Provide 2-3 distinct outfit options with brief descriptions.')" class="ai-suggestion-btn mt-2 py-2 px-4 rounded-md text-sm">✨ Get AI Suggestions</button>
+                            </div>
+                             <div>
+                                <h4 class="font-semibold text-lg text-gray-700">Men</h4>
+                                <div id="tirumala-reception-men-suggestions" class="text-gray-600 italic mt-1">Suggestions to be added soon.</div>
+                                <button onclick="getAISuggestions('tirumala-reception-men', 'Suggest smart and comfortable Indian or Indo-western attire for men attending an evening reception and dinner in Tirumala. The event is on July 26th. Provide 2-3 distinct outfit options with brief descriptions.')" class="ai-suggestion-btn mt-2 py-2 px-4 rounded-md text-sm">✨ Get AI Suggestions</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Wedding Ceremony (Tirumala - July 27th)</h3>
+                        <div class="mt-4 grid sm:grid-cols-2 gap-x-8 gap-y-4">
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-700">Women</h4>
+                                <p class="text-gray-600">Silk sarees are recommended for the traditional ceremony.</p>
+                            </div>
+                             <div>
+                                <h4 class="font-semibold text-lg text-gray-700">Men</h4>
+                                <div id="tirumala-wedding-men-suggestions" class="text-gray-600 italic mt-1">Suggestions to be added soon.</div>
+                                <button onclick="getAISuggestions('tirumala-wedding-men', 'Suggest appropriate traditional Indian attire for men attending an early morning wedding ceremony in Tirumala. Provide 2-3 distinct outfit options with brief descriptions.')" class="ai-suggestion-btn mt-2 py-2 px-4 rounded-md text-sm">✨ Get AI Suggestions</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-2xl font-bold text-gray-800">Reception (Delhi - August 2nd)</h3>
+                        <div class="mt-4 grid sm:grid-cols-2 gap-x-8 gap-y-4">
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-700">Women</h4>
+                                <div id="delhi-reception-women-suggestions" class="text-gray-600 italic mt-1">Suggestions to be added soon.</div>
+                                <button onclick="getAISuggestions('delhi-reception-women', 'Suggest elegant and festive attire options for women attending an Indian wedding reception in Delhi. The event is in August at 7 PM. Provide 3-4 distinct styles with brief descriptions, suitable for a celebratory evening.')" class="ai-suggestion-btn mt-2 py-2 px-4 rounded-md text-sm">✨ Get AI Suggestions</button>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-700">Men</h4>
+                                <div id="delhi-reception-men-suggestions" class="text-gray-600 italic mt-1">Suggestions to be added soon.</div>
+                                <button onclick="getAISuggestions('delhi-reception-men', 'Suggest smart and stylish attire options for men attending an Indian wedding reception in Delhi. The event is in August at 7 PM. Provide 2-3 distinct styles with brief descriptions, suitable for a celebratory evening.')" class="ai-suggestion-btn mt-2 py-2 px-4 rounded-md text-sm">✨ Get AI Suggestions</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <div id="loader" class="loader" style="display: none;"></div>
+            <p id="modalMessageText"></p>
+            <button onclick="closeModal()" class="mt-4 py-2 px-4 bg-[#A67B5B] text-white rounded-md hover:bg-[#8C6A4D]">Close</button>
+        </div>
+    </div>
+
+    <script>
+        const tabs = document.querySelectorAll('.content-tab');
+        const buttons = document.querySelectorAll('.tab-button');
+        const modal = document.getElementById('messageModal');
+        const modalMessageText = document.getElementById('modalMessageText');
+        const loader = document.getElementById('loader');
+
+        function showTab(tabId) {
+            tabs.forEach(tab => {
+                tab.style.display = (tab.id === tabId) ? 'block' : 'none';
+            });
+            
+            buttons.forEach(button => {
+                if (button.getAttribute('onclick').includes(tabId)) {
+                    button.classList.add('tab-active');
+                    button.classList.remove('bg-transparent', 'text-[#A67B5B]');
+                } else {
+                    button.classList.remove('tab-active');
+                    button.classList.add('bg-transparent', 'text-[#A67B5B]');
+                }
+            });
+        }
+        // Initialize first tab
+        showTab('schedule');
+
+
+        function showModal(message, isLoading = false) {
+            modalMessageText.textContent = message;
+            loader.style.display = isLoading ? 'block' : 'none';
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        async function getAISuggestions(suggestionType, promptText) {
+            const suggestionDiv = document.getElementById(`${suggestionType}-suggestions`);
+            if (!suggestionDiv) {
+                console.error('Suggestion div not found for:', suggestionType);
+                showModal('Error: Could not find where to display suggestions.');
+                return;
+            }
+
+            showModal('Fetching suggestions...', true);
+
+            const apiKey = ""; // API key will be injected by the environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            
+            let chatHistory = [{ role: "user", parts: [{ text: promptText }] }];
+            const payload = { contents: chatHistory };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    console.error('API Error:', errorData);
+                    throw new Error(`API request failed with status ${response.status}: ${errorData.error?.message || 'Unknown error'}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    suggestionDiv.innerHTML = text.replace(/\n/g, '<br>'); // Preserve line breaks
+                    suggestionDiv.classList.remove('italic');
+                    suggestionDiv.classList.add('text-gray-700'); // Change text color for better readability
+                    closeModal();
+                } else {
+                    console.error('Unexpected API response structure:', result);
+                    throw new Error('Could not retrieve suggestions from the AI.');
+                }
+            } catch (error) {
+                console.error('Error fetching AI suggestions:', error);
+                suggestionDiv.textContent = 'Sorry, could not fetch suggestions at this time.';
+                suggestionDiv.classList.remove('italic');
+                suggestionDiv.classList.add('text-red-500');
+                showModal(`Error: ${error.message}`);
+            }
+        }
+    </script>
+</body>
+</html>
+
