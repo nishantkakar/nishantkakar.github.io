@@ -3,19 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shruthi & Nishant's Wedding</title>
+    <title>Nishant & Shruthi's Wedding</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices: 
+        - Report Info: Main Events Overview -> Goal: Inform (High-Level) -> Presentation: Enhanced text and styling on the "Events" tab. Justification: Provides immediate key dates and events in a more engaging manner.
+        - Report Info: Event Timeline -> Goal: Inform (Detailed) -> Presentation: A vertical, icon-enhanced timeline on the "Schedule" tab (conditionally shown). Interaction: N/A, clarity is prioritized. Justification: A visual timeline is more engaging for detailed exploration.
+        - Report Info: Multiple Locations -> Goal: Organize -> Presentation: Content cards on the "Locations" tab (conditionally shown), including addresses and direct text links to Google Maps. Interaction: Click map link to open Google Maps. Justification: Grouping location info prevents clutter.
+        - Report Info: Wardrobe Suggestions -> Goal: Inform & Assist -> Presentation: Structured text on the "Wardrobe" tab (conditionally shown) with direct suggestions. Interaction: N/A. Justification: Provides clear guidance.
+        - Report Info: RSVP Form -> Goal: Collect Responses -> Presentation: Embedded Google Form on the "RSVP" tab (always visible). Interaction: Fill out and submit the form. Justification: Provides a direct and easy way for guests to confirm attendance.
+    -->
     <style>
         body {
             font-family: 'Lato', sans-serif;
             background-color: #FFFBF5; /* Light warm beige */
             color: #5C3D2E; /* Dark brown */
         }
-        h1, h2, h3 {
+        h1, h2, h3, h4 {
             font-family: 'Playfair Display', serif;
+        }
+        .tab-button {
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         .tab-active {
             background-color: #E0C097; /* Muted gold */
@@ -25,57 +35,22 @@
         .timeline-item::before {
             content: '';
             position: absolute;
-            top: 1.25rem; /* Adjust to align with text */
-            left: -0.45rem; /* Half of width to center on line */
+            top: 1.25rem; 
+            left: -0.45rem; 
             width: 1.25rem;
             height: 1.25rem;
-            background-color: #E0C097; /* Muted gold */
-            border: 3px solid #FFFBF5; /* Background color for "cutout" effect */
+            background-color: #E0C097; 
+            border: 3px solid #FFFBF5; 
             border-radius: 50%;
             z-index: 1;
         }
         .timeline-line {
             position: absolute;
-            left: 0; /* Aligns with the bullet point center */
-            top: 1.25rem; /* Start below the first bullet's center */
-            bottom: -1.25rem; /* Extend slightly past the last item for visual balance */
+            left: 0; 
+            top: 1.25rem; 
+            bottom: -1.25rem; 
             width: 2px;
-            background-color: #E0C097; /* Muted gold */
-        }
-        /* Modal styles (kept for potential future use, though AI buttons are removed) */
-        .modal {
-            display: none; /* Hidden by default */
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 15% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            max-width: 400px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #A67B5B;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 10px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            background-color: #E0C097; 
         }
         .rsvp-iframe-container {
             display: flex;
@@ -86,6 +61,17 @@
         }
         .rsvp-iframe-container iframe {
             max-width: 100%; 
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .event-card {
+            border: 2px solid #E0C097; /* Muted gold border */
+            background-color: #FDF8F0; /* Slightly off-white, warmer than default bg-white */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .event-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(92, 61, 46, 0.15); /* Darker shadow on hover */
         }
     </style>
 </head>
@@ -94,19 +80,30 @@
     <div class="container mx-auto max-w-5xl p-4 sm:p-6 lg:p-8">
         
         <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-[#A67B5B]">Shruthi & Nishant</h1>
+            <h1 class="text-4xl md:text-5xl font-bold text-[#A67B5B]">Nishant & Shruthi</h1>
             <p class="text-lg text-gray-600 mt-2">Celebrating Their Wedding</p>
         </header>
 
         <nav class="flex flex-wrap justify-center border-b-2 border-[#E0C097] mb-8">
-            <button onclick="showTab('schedule')" class="tab-button tab-active py-3 px-4 sm:px-6 text-base sm:text-lg focus:outline-none transition-colors duration-300 rounded-t-md">Schedule</button>
-            <button onclick="showTab('locations')" class="tab-button py-3 px-4 sm:px-6 text-base sm:text-lg focus:outline-none transition-colors duration-300 rounded-t-md">Locations</button>
-            <button onclick="showTab('wardrobe')" class="tab-button py-3 px-4 sm:px-6 text-base sm:text-lg focus:outline-none transition-colors duration-300 rounded-t-md">Wardrobe</button>
-            <button onclick="showTab('rsvp')" class="tab-button py-3 px-4 sm:px-6 text-base sm:text-lg focus:outline-none transition-colors duration-300 rounded-t-md">RSVP</button>
+            <button id="nav-events" onclick="showTab('events')" class="tab-button py-3 px-4 sm:px-6 text-base sm:text-lg focus:outline-none rounded-t-md">Events</button>
+            <button id="nav-schedule" onclick="showTab('schedule')" class="tab-button py-3 px-4 sm:px-6 text-base sm:text-lg focus:outline-none rounded-t-md" style="display: none;">Schedule</button>
+            <button id="nav-locations" onclick="showTab('locations')" class="tab-button py-3 px-4 sm:px-6 text-base sm:text-lg focus:outline-none rounded-t-md" style="display: none;">Locations</button>
+            <button id="nav-wardrobe" onclick="showTab('wardrobe')" class="tab-button py-3 px-4 sm:px-6 text-base sm:text-lg focus:outline-none rounded-t-md" style="display: none;">Wardrobe</button>
+            <button id="nav-rsvp" onclick="showTab('rsvp')" class="tab-button py-3 px-4 sm:px-6 text-base sm:text-lg focus:outline-none rounded-t-md">RSVP</button>
         </nav>
 
         <main>
-            <div id="schedule" class="content-tab">
+            <div id="events" class="content-tab">
+                <div class="text-center p-6 bg-white rounded-lg shadow-lg">
+                    <!-- <h2 class="text-3xl font-bold text-[#A67B5B] mb-6">Join Us in Celebration!</h2> -->
+                    <img src="invite.jpeg" alt="Wedding Invitation Placeholder">
+                    <p class="mt-10 text-gray-700 text-lg">
+                        We can't wait to celebrate with you! Please visit the <button onclick="showTab('rsvp'); if (navButtons['rsvp']) { navButtons['rsvp'].focus(); }" class="text-[#A67B5B] underline hover:text-[#8C6A4D] font-semibold">RSVP</button> tab to confirm your presence.
+                    </p>
+                </div>
+            </div>
+
+            <div id="schedule" class="content-tab" style="display: none;">
                 <div class="text-center mb-8">
                     <h2 class="text-3xl font-bold text-[#A67B5B]">Event Schedule</h2>
                     <p class="mt-2 text-gray-600 max-w-2xl mx-auto">Here is the detailed schedule for our wedding celebrations. We can't wait to share these special moments with you!</p>
@@ -256,7 +253,7 @@
                             </div>
                              <div>
                                 <h4 class="font-semibold text-lg text-gray-700">Men</h4>
-                                <p class="text-gray-600 mt-1">Dhoti & Kurta or Shirt & Pant</p>
+                                <p class="text-gray-600 mt-1">Kurta & Pyjama or Shirt & Pant</p>
                             </div>
                         </div>
                     </div>
@@ -287,58 +284,88 @@
         </main>
     </div>
 
-    <div id="messageModal" class="modal">
-        <div class="modal-content">
-            <div id="loader" class="loader" style="display: none;"></div>
-            <p id="modalMessageText"></p>
-            <button onclick="closeModal()" class="mt-4 py-2 px-4 bg-[#A67B5B] text-white rounded-md hover:bg-[#8C6A4D]">Close</button>
-        </div>
-    </div>
-
     <script>
-        const tabs = document.querySelectorAll('.content-tab');
-        const buttons = document.querySelectorAll('.tab-button');
-        const modal = document.getElementById('messageModal'); // Kept for potential future use
-        const modalMessageText = document.getElementById('modalMessageText'); // Kept
-        const loader = document.getElementById('loader'); // Kept
+        const allTabs = ['events', 'schedule', 'locations', 'wardrobe', 'rsvp'];
+        const conditionalTabs = ['schedule', 'locations', 'wardrobe'];
+        
+        const navButtons = {};
+        allTabs.forEach(id => navButtons[id] = document.getElementById(`nav-${id}`));
 
-        function showTab(tabId) {
-            tabs.forEach(tab => {
-                tab.style.display = (tab.id === tabId) ? 'block' : 'none';
-            });
+        const contentTabs = {};
+        allTabs.forEach(id => contentTabs[id] = document.getElementById(id));
+
+        function showTab(tabIdToShow) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const expandDetails = urlParams.get('expand') === 'true';
+
+            // If trying to access a conditional tab without expand=true, default to 'events'
+            if (conditionalTabs.includes(tabIdToShow) && !expandDetails) {
+                tabIdToShow = 'events';
+            }
             
-            buttons.forEach(button => {
-                if (button.getAttribute('onclick').includes(tabId)) {
-                    button.classList.add('tab-active');
-                    button.classList.remove('bg-transparent', 'text-[#A67B5B]');
-                } else {
-                    button.classList.remove('tab-active');
-                    button.classList.add('bg-transparent', 'text-[#A67B5B]');
+            allTabs.forEach(tabId => {
+                const isConditionalAndHidden = conditionalTabs.includes(tabId) && !expandDetails;
+                
+                if (navButtons[tabId]) { 
+                    navButtons[tabId].style.display = isConditionalAndHidden ? 'none' : 'inline-block';
+                }
+
+                if (contentTabs[tabId]) { 
+                    if (tabId === tabIdToShow) {
+                        contentTabs[tabId].style.display = 'block';
+                        if (navButtons[tabId]) navButtons[tabId].classList.add('tab-active');
+                         // Update hash in URL for direct linking, only if not already there or for 'events'
+                        if (tabId !== 'events' || (tabId === 'events' && window.location.hash)) { // Avoid adding #events if it's the default view
+                            history.pushState(null, '', `${window.location.pathname}${window.location.search}#${tabId}`);
+                        } else if (tabId === 'events' && window.location.hash) { // Clear hash if navigating to events
+                             history.pushState(null, '', `${window.location.pathname}${window.location.search}`);
+                        }
+
+                    } else {
+                        contentTabs[tabId].style.display = 'none';
+                        if (navButtons[tabId]) navButtons[tabId].classList.remove('tab-active');
+                    }
                 }
             });
-        }
-        // Initialize first tab
-        showTab('schedule');
-
-        // Functions for modal (kept for potential future use, though no active elements call them now)
-        function showModal(message, isLoading = false) {
-            modalMessageText.textContent = message;
-            loader.style.display = isLoading ? 'block' : 'none';
-            modal.style.display = 'block';
-        }
-
-        function closeModal() {
-            modal.style.display = 'none';
+            
+            // Ensure 'events' tab is active if no specific tab is shown (e.g. on initial load without hash)
+            // or if a conditional tab was requested without expand=true
+            if (!contentTabs[tabIdToShow] || (conditionalTabs.includes(tabIdToShow) && !expandDetails)) {
+                 if (contentTabs['events']) contentTabs['events'].style.display = 'block';
+                 if (navButtons['events']) navButtons['events'].classList.add('tab-active');
+                 history.pushState(null, '', `${window.location.pathname}${window.location.search}`); // Clear hash for default events view
+            }
         }
 
-        // getAISuggestions function is no longer needed as all AI buttons have been removed.
-        // You can remove this function if you are sure no other elements will use it.
-        // For now, it's left commented out or can be fully removed.
-        /*
-        async function getAISuggestions(suggestionType, promptText) {
-            // ... (original function code)
+        function initializeTabs() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const expandDetails = urlParams.get('expand') === 'true';
+            let initialTab = 'events'; // Default to events
+
+            const hash = window.location.hash.substring(1);
+            if (hash && allTabs.includes(hash)) {
+                if (conditionalTabs.includes(hash) && expandDetails) {
+                    initialTab = hash;
+                } else if (!conditionalTabs.includes(hash)) { // Always allow 'events' or 'rsvp' from hash
+                    initialTab = hash;
+                }
+            }
+            
+            conditionalTabs.forEach(tabId => {
+                if (navButtons[tabId]) {
+                    navButtons[tabId].style.display = expandDetails ? 'inline-block' : 'none';
+                }
+            });
+            
+            showTab(initialTab);
         }
-        */
+        
+        window.onpopstate = function(event) {
+            initializeTabs();
+        };
+
+        document.addEventListener('DOMContentLoaded', initializeTabs);
+
     </script>
 </body>
 </html>
